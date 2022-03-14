@@ -8,3 +8,8 @@ Prereqs:
 3. Connected login and search URL
 4. Roses login and search URL
 5. Chromedriver
+
+How to run:
+1. Add connected/roses user/pass to roses.py.
+2. Have csv file ready 
+3. Trigger main.py 
