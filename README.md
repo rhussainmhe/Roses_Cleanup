@@ -13,3 +13,4 @@ How to run:
 1. Add connected/roses user/pass to roses.py.
 2. Have csv file ready 
 3. Trigger main.py 
+4. CSV log file of changes saved in /output/ dir
