@@ -15,8 +15,8 @@ driver = webdriver.Chrome(options=options, executable_path='/Users/riaz_hussain/
 
 class fixer:
     def search_roses_name(self):
-        connected_url = 'https://connected.mcgraw-hill.com/connected/login.do'
-        connected_search_url = 'https://connected.mcgraw-hill.com/connected/support.accountSearch.do?accountName=&oksAccountId='
+        connected_url = '' #connected login URL here
+        connected_search_url = '' #connected search url here
         rows=[] # Stores csv file
         self.true_roses_name = [] #Stores roses name once searched in connectEd
         #List of bad strings to lookup in roses name
@@ -132,8 +132,8 @@ class fixer:
 
             #login to roses
             print('logging into roses')
-            roses_url = 'https://roses-prod.cdiapps.com/roses/login.do'
-            search = 'https://roses-prod.cdiapps.com/roses/subscriptionSearchAccount.do'
+            roses_url = '' #roses login url here
+            search = '' #roses search url here
             time.sleep(4)
             driver.get(roses_url)
             roses_body_el = driver.find_element(by=By.CSS_SELECTOR, value="body")
