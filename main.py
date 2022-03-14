@@ -17,10 +17,34 @@ class fixer:
     def search_roses_name(self):
         connected_url = 'https://connected.mcgraw-hill.com/connected/login.do'
         connected_search_url = 'https://connected.mcgraw-hill.com/connected/support.accountSearch.do?accountName=&oksAccountId='
-        rows=[]
-        self.true_roses_name = []
+        rows=[] # Stores csv file
+        self.true_roses_name = [] #Stores roses name once searched in connectEd
+        #List of bad strings to lookup in roses name
+        self.bad_strings = ['(SSO+BUIP)',
+                            '(SSO + BUIP)',
+                            '(BUIP+SSO)',
+                            '(BUIP + SSO)',
+                            '(SSO +BUIP)',
+                            '(SSO+ BUIP)',
+                            '(BUIP +SSO)',
+                            '(BUIP+ SSO)',
+                            '(SSO+OR)',
+                            '(BUIP)',
+                            '(SSO+OR API)',
+                            '(SSO + OR API)',
+                            '(SSO + OR)',
+                            '(SSO+OR)',
+                            '(SSO +OR)',
+                            '(SSO+ OR)',
+                            '(OR + SSO)',
+                            '(SSO + OR CSV)',
+                            '(SSO+OR API)',
+                            '(OR+SSO)',
+                            '(SSO BUIP)',
+                            '(SSO)',
+                            '(BUIP+ SSO)']
 
-        #Open CSV and read oracle number
+        # Open list of oracle accounts to fix (oracle name column a, oracle number column b)
         with open("/Users/riaz_hussain/Downloads/testingtesting.csv", 'r') as file:
             csvreader = csv.reader(file)
             header = next(csvreader)
@@ -30,7 +54,7 @@ class fixer:
                 rows.append(row)
 
             for oracle_ids in rows:
-                #login to connected
+                #goto to connected login page
                 driver.get(connected_url)
                 connected_body_el = driver.find_element(by=By.CSS_SELECTOR, value="body")
                 connected_html_str = connected_body_el.get_attribute("innerHTML")
@@ -38,13 +62,13 @@ class fixer:
                 connected_html_obj = HTML(html=connected_html_str)
                 time.sleep(2)
 
-                #input connected user pass
+                #input connected user pass and login
                 driver.find_element(By.NAME, "loginUserName").send_keys(roses.u)
                 driver.find_element(By.NAME, "loginPassword").send_keys(roses.cep + Keys.ENTER)
                 time.sleep(2)
 
-
                 try:
+                    #Search the oracle id in connected
                     driver.get(connected_search_url + oracle_ids[1])
                     print(connected_search_url + oracle_ids[1])
                     time.sleep(2)
@@ -52,49 +76,18 @@ class fixer:
                     connected_html_str = connected_body_el.get_attribute("innerHTML")
                     connected_html_obj = HTML(html=connected_html_str)
 
-                    # actual_roses_name = connected_html_obj.find("#accountName", first=True).text
-                    actual_roses_name = driver.find_element(by=By.XPATH, value='/html/body/div[1]/section/div/div[4]/table/tbody/tr/td[2]/div').text
+                    # Find the returned oracle name and store it
+
+                    actual_roses_name = driver.find_element(by=By.XPATH, value='//*[@id="supportAccountSearchResults"]/table/tbody/tr/td[2]/div').text
+                    print(actual_roses_name)
+
+                    self.bad_string_finder = [x for x in self.bad_strings if x in actual_roses_name]
 
                     if '(Managed)' in actual_roses_name:
                         self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + 'Skipped--Customer name already flagged with "(Managed)"')
-                    elif '(SSO+BUIP)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO+BUIP)','(Managed)'))
-                    elif '(SSO + BUIP)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO + BUIP)','(Managed)'))
-                    elif '(BUIP+SSO)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(BUIP+SSO)','(Managed)'))
-                    elif '(BUIP + SSO)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(BUIP + SSO)','(Managed)'))
-                    elif '(SSO+OR)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO+OR)','(Managed)'))
-                    elif '(BUIP)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(BUIP)','(Managed)'))
-                    elif '(SSO+OR API)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO+OR API)','(Managed)'))
-                    elif '(SSO + OR API)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO + OR API)','(Managed)'))
-                    elif '(SSO + OR)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO + OR)','(Managed)'))
-                    elif '(SSO+OR)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO+OR)','(Managed)'))
-                    elif '(SSO +OR)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO +OR)','(Managed)'))
-                    elif '(SSO+ OR)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO+ OR)','(Managed)'))
-                    elif '(OR + SSO)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(OR + SSO)','(Managed)'))
-                    elif '(SSO + OR CSV)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO + OR CSV)','(Managed)'))
-                    elif '(SSO+OR API)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO+OR API)','(Managed)'))
-                    elif '(SSO)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO)','(Managed)'))
-                    elif '(OR+SSO)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(OR+SSO)','(Managed)'))
-                    elif '(SSO BUIP)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(SSO BUIP)','(Managed)'))
-                    elif '(BUIP+ SSO)' in actual_roses_name:
-                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace('(BUIP+ SSO)','(Managed)'))
+                    elif self.bad_string_finder[0] in actual_roses_name:
+                        self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + actual_roses_name.replace(self.bad_string_finder[0],'(Managed)'))
+                        print('Showing badstring here ' + self.bad_string_finder[0])
                     else:
                         self.true_roses_name.append(oracle_ids[1] + ',' + actual_roses_name + ',' + 'Skipped--Cannot find search string in roses name')
 
@@ -107,9 +100,9 @@ class fixer:
         #Delete connected csv file if it exists
         if(os.path.exists('oracle_connected_names.csv') and os.path.isfile('oracle_connected_names.csv')):
             os.remove('oracle_connected_names.csv')
-            print('file deleted')
+            print('file deleted (oracle_connected_names.csv)')
         else:
-            print('file not found')
+            print('file not found (oracle_connected_names.csv)')
 
         #Create connected csv file
         with open('oracle_connected_names.csv', 'w') as file:
@@ -121,7 +114,7 @@ class fixer:
         #Write changes to csv and log errors from try
         header = ['oracle_id','oracle_name','updated_oracle_name','status']
         connected_oracle_names = ('oracle_connected_names.csv')
-        filename = ('output/RosesAccounts' + time.strftime('%Y%m%d-%H%M%S')+'testingtesting.csv')
+        filename = ('output/RosesAccounts' + time.strftime('%Y%m%d-%H%M%S')+'justtesting.csv')
         rows = []
 
 
@@ -154,8 +147,6 @@ class fixer:
             driver.find_element(By.NAME, "password").send_keys(roses.p + Keys.ENTER)
             time.sleep(5)
 
-            bad_strings = ['(SSO+BUIP)','(SSO + BUIP)','(BUIP+SSO)','(BUIP + SSO)','(SSO +BUIP)','(SSO+ BUIP)','(BUIP +SSO)','(BUIP+ SSO)','(SSO+OR)','(BUIP)','(SSO+OR API)','(SSO + OR API)','(SSO + OR)','(SSO+OR)','(SSO +OR)','(SSO+ OR)','(OR + SSO)','(SSO + OR CSV)',' (SSO+OR API)','(SSO)','(OR+SSO)','(SSO BUIP)','(BUIP+ SSO)']
-
             for oracle_names in rows:
                 driver.get(search)
                 roses_body_el = driver.find_element(by=By.CSS_SELECTOR, value="body")
@@ -168,7 +159,7 @@ class fixer:
                 if '(Managed)' in oracle_names[1]:
                     print('Managed already in name: ' + str(oracle_names[1]))
                     pass
-                elif any(x in oracle_names[1] for x in bad_strings) and 'Err' not in oracle_names[2]:
+                elif any(x in oracle_names[1] for x in self.bad_strings) and 'Err' not in oracle_names[2]:
                     print(oracle_names)
                     print('found oracle name, searching..')
                     driver.find_element(By.NAME, "acctNm").send_keys(oracle_names[1] + Keys.ENTER)
