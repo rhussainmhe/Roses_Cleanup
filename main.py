@@ -49,7 +49,7 @@ class fixer:
             csvreader = csv.reader(file)
             header = next(csvreader)
 
-            #Move all csv row values to rows varbiable
+            #Move all csv row values to rows variable
             for row in csvreader:
                 rows.append(row)
 
